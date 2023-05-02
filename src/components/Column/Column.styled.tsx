@@ -5,12 +5,14 @@ export const ColumnContainer = styled(Card)`
   flex: 1 1 auto;
   min-width: 18rem;
   max-width: 22rem;
+  height: fit-content;
 `;
 
 export const IssuesList = styled(Card.Body)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 150px;
 `;
 
 export const ColumnName = styled(Card.Title)`

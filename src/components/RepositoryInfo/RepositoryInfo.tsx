@@ -1,10 +1,32 @@
-import { Text } from './RepositoryInfo.styled';
+import { useSelector } from 'react-redux';
+import { Container, Link, LinksWrapper, Stars } from './RepositoryInfo.styled';
+import {
+  selectAuthor,
+  selectRepository,
+} from '../../redux/dashboard/selectors';
+import { IoIosArrowForward } from 'react-icons/io';
+import { BsFillStarFill } from 'react-icons/bs';
 
 const RepositoryInfo = () => {
+  const author = useSelector(selectAuthor);
+  const repository = useSelector(selectRepository);
+
   return (
-    <div>
-      <Text>Info</Text>
-    </div>
+    <Container>
+      <LinksWrapper>
+        <Link href={author.url} target="_blank" rel="noreferrer noopener">
+          {author.username}
+        </Link>
+        <IoIosArrowForward />
+        <Link href={repository.url} target="_blank" rel="noreferrer noopener">
+          {repository.name}
+        </Link>
+      </LinksWrapper>
+      <Stars>
+        {repository.stars}
+        <BsFillStarFill fill="yellow" stroke="black" strokeWidth="1" />
+      </Stars>
+    </Container>
   );
 };
 
