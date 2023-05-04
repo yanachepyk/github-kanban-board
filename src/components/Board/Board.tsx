@@ -1,18 +1,11 @@
-import { useSelector } from 'react-redux';
 import Column from '../Column/Column';
 import { BoardContainer, BoardStyled } from './Board.styled';
 import { DragDropContext } from 'react-beautiful-dnd';
-import {
-  selectColumns,
-  selectColumnsOrder,
-} from '../../redux/dashboard/selectors';
 import { useDispatch } from 'react-redux';
 import { updateIssuesLocation } from '../../redux/dashboard/dashboardSlice';
 
-const Board = () => {
+const Board = ({columns, columnsOrder}: any) => {
   const dispatch = useDispatch();
-  const columns = useSelector(selectColumns);
-  const columnsOrder = useSelector(selectColumnsOrder);
 
   const onDragEnd = ({ destination, source, draggableId }: any) => {
     if (!destination) {
@@ -37,7 +30,7 @@ const Board = () => {
 
       const newColumn = {
         ...start,
-        issuesIds: newTaskIds,
+        issuesIds: newTaskIds.map(Number),
       };
 
       dispatch(updateIssuesLocation({
@@ -55,12 +48,12 @@ const Board = () => {
 
     const newStart = {
       ...start,
-      issuesIds: startTaskIds,
+      issuesIds: startTaskIds.map(Number),
     };
 
     const newFinish = {
       ...finish,
-      issuesIds: finishTaskIds,
+      issuesIds: finishTaskIds.map(Number),
     };
 
     dispatch(updateIssuesLocation({
@@ -82,4 +75,5 @@ const Board = () => {
     </BoardStyled>
   );
 };
+
 export default Board;

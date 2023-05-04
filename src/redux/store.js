@@ -15,7 +15,7 @@ import { dashboardSlice } from './dashboard/dashboardSlice'
 const persistConfig = {
   key: 'dashboard',
   storage,
-//   whitelist: ['token']
+  whitelist: ['repositories']
 };
 
 export const store = configureStore({

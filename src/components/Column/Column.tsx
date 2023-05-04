@@ -11,8 +11,11 @@ const Column = ({ column }: any) => {
     <ColumnContainer>
       <ColumnName>{column.title}</ColumnName>
       <StrictModeDroppable droppableId={column.id}>
-        {provided => (
-          <IssuesList ref={provided.innerRef} {...provided.droppableProps}>
+        {(provided, snapshot) => (
+          <IssuesList 
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+          dragingover={`${snapshot.isDraggingOver}`}>
             {column.issuesIds.map((id: number, index: number) => (
               <Issue key={id} issue={issues[id]} index={index} />
             ))}

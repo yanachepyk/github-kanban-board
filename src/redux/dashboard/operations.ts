@@ -7,7 +7,6 @@ export const fetchIssues = createAsyncThunk(
   'dashboard/fetchIssues',
   async ({author, repository}: FetchIssuesBody, thunkApi) => {
     try {
-      console.log(author, repository); 
       const { data } = await axios.get(`/repos/${author}/${repository}/issues?state=all`);
 
       return data;
@@ -21,7 +20,6 @@ export const fetchAuthor = createAsyncThunk(
   'dashboard/fetchAuthor',
   async (author: string, thunkApi) => {
     try {
-      console.log(author); 
       const { data } = await axios.get(`/users/${author}`);
 
       return data;

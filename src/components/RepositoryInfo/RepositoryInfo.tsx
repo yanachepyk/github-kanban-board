@@ -1,16 +1,8 @@
-import { useSelector } from 'react-redux';
 import { Container, Link, LinksWrapper, Stars } from './RepositoryInfo.styled';
-import {
-  selectAuthor,
-  selectRepository,
-} from '../../redux/dashboard/selectors';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BsFillStarFill } from 'react-icons/bs';
 
-const RepositoryInfo = () => {
-  const author = useSelector(selectAuthor);
-  const repository = useSelector(selectRepository);
-
+const RepositoryInfo = ({author, repository}: any) => {
   return (
     <Container>
       <LinksWrapper>

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchAuthor, fetchIssues, fetchRepository } from './operations';
+import { createRepositoryId } from '../../shared/utils/string/repositoryIdentifier';
 
 enum Columns {
   TODO = 'col-1',
@@ -7,16 +8,16 @@ enum Columns {
   CLOSED = 'col-3'
 }
 
-const initialState: any = {
-  loading: false,
-  author: {
-    url: null,
-    username: ''
-  },
+const repositoryTemplate = {
+  identifier: null,
   repository: {
-    url: null,
     name: '',
-    stars: 0
+    url: null,
+    stars: 0,
+  },
+  author: {
+    username: '',
+    url: null,
   },
   issues: {},
   columns: {
@@ -35,7 +36,13 @@ const initialState: any = {
       title: 'Done',
       issuesIds: [],
     },
-  },
+  }
+}
+
+const initialState: any = {
+  loading: false,
+  repositories: {},
+  activeBoard: repositoryTemplate,
   columnsOrder: [Columns.TODO, Columns.IN_PROGRESS, Columns.CLOSED],
 };
 
@@ -44,29 +51,52 @@ export const dashboardSlice = createSlice({
   initialState,
   reducers: {
     updateIssuesLocation(state, action) {
-      state.columns = action.payload;
+      state.activeBoard.columns = action.payload;
+    },
+    setActiveRepository(state, action) {
+      const storedRepository = state.repositories[action.payload];
+
+      if (storedRepository && storedRepository.identifier) {
+        state.activeBoard = {
+          ...storedRepository
+        };
+      } else {
+        state.activeBoard = {
+          ...repositoryTemplate
+        };
+      }
+    },
+    saveRepository(state) {
+      if (state.activeBoard.identifier) {
+        state.repositories[state.activeBoard.identifier] = state.activeBoard;
+      }
     }
   },
   extraReducers: builder =>
     builder
       .addCase(fetchIssues.fulfilled, (state, action: any) => {
         action.payload.forEach((issue: any) => {
+          /** Skip if already exist, as it might be already reordered and moved to another column */
+          if (state.activeBoard.issues[issue.id]) {
+            return;
+          }
+
           /** Closed issues */
           if (issue.state === 'closed') {
-            state.columns[Columns.CLOSED].issuesIds.push(issue.id);
+            state.activeBoard.columns[Columns.CLOSED].issuesIds.push(issue.id);
           }
 
           /** In Progress issues */
           if (issue.assignees.length && issue.state !== 'closed') {
-            state.columns[Columns.IN_PROGRESS].issuesIds.push(issue.id);
+            state.activeBoard.columns[Columns.IN_PROGRESS].issuesIds.push(issue.id);
           }
 
           /** ToDo issues */
           if (!issue.assignees.length && issue.state === 'open') {
-            state.columns[Columns.TODO].issuesIds.push(issue.id);
+            state.activeBoard.columns[Columns.TODO].issuesIds.push(issue.id);
           }
 
-          state.issues[issue.id] = issue;
+          state.activeBoard.issues[issue.id] = issue;
         });
 
         state.loading = false;
@@ -78,8 +108,8 @@ export const dashboardSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchAuthor.fulfilled, (state, action: any) => {
-        state.author.url = action.payload.html_url;
-        state.author.username = action.payload.login;
+        state.activeBoard.author.url = action.payload.html_url;
+        state.activeBoard.author.username = action.payload.login;
         state.loading = false;
       })
       .addCase(fetchAuthor.pending, state => {
@@ -89,9 +119,10 @@ export const dashboardSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchRepository.fulfilled, (state, action: any) => {
-        state.repository.url = action.payload.html_url;
-        state.repository.name = action.payload.name;
-        state.repository.stars = action.payload.stargazers_count;
+        state.activeBoard.identifier = createRepositoryId(action.payload.owner.login, action.payload.name);
+        state.activeBoard.repository.url = action.payload.html_url;
+        state.activeBoard.repository.name = action.payload.name;
+        state.activeBoard.repository.stars = action.payload.stargazers_count;
         state.loading = false;
       })
       .addCase(fetchRepository.pending, state => {
@@ -102,4 +133,4 @@ export const dashboardSlice = createSlice({
       }),
 });
 
-export const { updateIssuesLocation } = dashboardSlice.actions;
+export const { updateIssuesLocation, setActiveRepository, saveRepository } = dashboardSlice.actions;

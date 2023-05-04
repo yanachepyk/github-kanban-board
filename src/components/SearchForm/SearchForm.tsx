@@ -6,10 +6,12 @@ import {
 } from './SearchForm.styled';
 import { useDispatch } from 'react-redux';
 import { FetchIssuesAction, fetchAuthor, fetchIssues, fetchRepository } from '../../redux/dashboard/operations';
+import { saveRepository, setActiveRepository } from '../../redux/dashboard/dashboardSlice';
+import { createRepositoryId } from '../../shared/utils/string/repositoryIdentifier';
 
 const githubOriginUrl = "https://github.com";
 
-const SearchForm = () => {
+const SearchForm = ({boardId}: any) => {
   const dispatch = useDispatch();
 
   const handleFormSubmit = (e: any) => {
@@ -27,13 +29,16 @@ const SearchForm = () => {
 
       if (processedUrl.origin === githubOriginUrl) {
         const [_, author, repository] = processedUrl.pathname.split('/');
+        const repositoryId = createRepositoryId(author, repository);
 
-        console.log('Author: ', author);
-        console.log('Repository: ', repository);
+        if (boardId) {
+          dispatch(saveRepository());
+        }
 
-        dispatch(fetchIssues({ author, repository }) as unknown as FetchIssuesAction);
-        dispatch(fetchAuthor(author) as unknown as any);
+        dispatch(setActiveRepository(repositoryId));
         dispatch(fetchRepository({ author, repository }) as unknown as FetchIssuesAction);
+        dispatch(fetchAuthor(author) as unknown as any);
+        dispatch(fetchIssues({ author, repository }) as unknown as FetchIssuesAction);
 
         e.target.reset();
       }

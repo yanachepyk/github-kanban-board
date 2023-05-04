@@ -7,9 +7,13 @@ const Issue = ({ issue, index }: any) => {
   return (
     <Draggable draggableId={`${issue.id}`} index={index}>
       {provided => (
-        <IssueStyled {...provided.draggableProps} ref={provided.innerRef}>
+        <IssueStyled
+          {...provided.dragHandleProps}
+          {...provided.draggableProps}
+          ref={provided.innerRef}
+        >
           <IssueContainer>
-            <IssueName {...provided.dragHandleProps}>{issue.title}</IssueName>
+            <IssueName>{issue.title}</IssueName>
             <Card.Text title={issue.body}>
               {truncate(issue.body, 150)}
             </Card.Text>
