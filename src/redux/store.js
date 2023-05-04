@@ -15,7 +15,10 @@ import { dashboardSlice } from './dashboard/dashboardSlice'
 const persistConfig = {
   key: 'dashboard',
   storage,
-  whitelist: ['repositories']
+  whitelist: [
+    'repositories',
+    'activeBoard'
+  ]
 };
 
 export const store = configureStore({

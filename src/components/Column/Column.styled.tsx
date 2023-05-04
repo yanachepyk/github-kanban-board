@@ -6,6 +6,8 @@ export const ColumnContainer = styled(Card)`
   min-width: 23rem;
   max-width: 25rem;
   height: fit-content;
+  box-shadow: 0 0 5px 0px rgb(0 0 0 / 30%);
+  border: 0;
 `;
 
 export const IssuesList = styled(Card.Body)`
@@ -17,7 +19,7 @@ export const IssuesList = styled(Card.Body)`
   border-radius: 0.25rem;
   user-select: none;
   transition: background-color 200ms ease-in;
-  background-color: ${props => props.dragingover === 'true' ? '#b6ddff' : '#ffffff'};
+  background-color: ${props => props.draggingover === 'true' ? '#b6ddff' : '#efefef'};
 `;
 
 export const ColumnName = styled(Card.Title)`

@@ -9,13 +9,13 @@ const Column = ({ column }: any) => {
 
   return (
     <ColumnContainer>
-      <ColumnName>{column.title}</ColumnName>
+      <ColumnName>{column.title} ({column.issuesIds.length})</ColumnName>
       <StrictModeDroppable droppableId={column.id}>
         {(provided, snapshot) => (
           <IssuesList 
           ref={provided.innerRef}
           {...provided.droppableProps}
-          dragingover={`${snapshot.isDraggingOver}`}>
+          draggingover={`${snapshot.isDraggingOver}`}>
             {column.issuesIds.map((id: number, index: number) => (
               <Issue key={id} issue={issues[id]} index={index} />
             ))}

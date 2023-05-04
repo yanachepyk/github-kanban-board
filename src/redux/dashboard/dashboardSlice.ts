@@ -23,7 +23,7 @@ const repositoryTemplate = {
   columns: {
     [Columns.TODO]: {
       id: Columns.TODO,
-      title: 'ToDo',
+      title: 'Open',
       issuesIds: [],
     },
     [Columns.IN_PROGRESS]: {

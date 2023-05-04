@@ -7,12 +7,8 @@ import {
   selectActiveBoard,
   selectColumnsOrder,
 } from '../../redux/dashboard/selectors';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { saveRepository } from '../../redux/dashboard/dashboardSlice';
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
   const activeBoard = useSelector(selectActiveBoard);
   const columnsOrder = useSelector(selectColumnsOrder);
 
@@ -30,12 +26,6 @@ const Dashboard = () => {
   } else {
     pageContent = <EmptyState>No repository selected</EmptyState>;
   }
-
-  useEffect(() => {
-    return () => {
-      dispatch(saveRepository());
-    }
-  }, [dispatch]);
 
   return (
     <DashboardStyled>

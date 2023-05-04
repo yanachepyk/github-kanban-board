@@ -1,22 +1,25 @@
 import { Draggable } from 'react-beautiful-dnd';
-import { truncate } from '../../shared/utils/string/truncate';
 import { IssueContainer, IssueName, IssueStyled } from './Issue.styled';
-import { Card } from 'react-bootstrap';
+import { KandanTooltip } from '../../shared/components/Tooltip';
 
 const Issue = ({ issue, index }: any) => {
   return (
     <Draggable draggableId={`${issue.id}`} index={index}>
-      {provided => (
+      {(provided, snapshot) => (
         <IssueStyled
           {...provided.dragHandleProps}
           {...provided.draggableProps}
           ref={provided.innerRef}
+          isdragging={`${snapshot.isDragging}`}
         >
           <IssueContainer>
-            <IssueName>{issue.title}</IssueName>
-            <Card.Text title={issue.body}>
-              {truncate(issue.body, 150)}
-            </Card.Text>
+            <KandanTooltip
+              key={issue.id}
+              id={`${issue.id}`}
+              tooltip={issue.title}
+            >
+              <IssueName>{issue.title}</IssueName>
+            </KandanTooltip>
           </IssueContainer>
         </IssueStyled>
       )}

@@ -2,7 +2,7 @@ import Column from '../Column/Column';
 import { BoardContainer, BoardStyled } from './Board.styled';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useDispatch } from 'react-redux';
-import { updateIssuesLocation } from '../../redux/dashboard/dashboardSlice';
+import { saveRepository, updateIssuesLocation } from '../../redux/dashboard/dashboardSlice';
 
 const Board = ({columns, columnsOrder}: any) => {
   const dispatch = useDispatch();
@@ -37,30 +37,31 @@ const Board = ({columns, columnsOrder}: any) => {
         ...columns,
         [newColumn.id]: newColumn,
       }));
-      return;
+    } else {
+      const startTaskIds = [...start.issuesIds];
+      const finishTaskIds = [...finish.issuesIds];
+      
+      startTaskIds.splice(source.index, 1);
+      finishTaskIds.splice(destination.index, 0, draggableId);
+  
+      const newStart = {
+        ...start,
+        issuesIds: startTaskIds.map(Number),
+      };
+  
+      const newFinish = {
+        ...finish,
+        issuesIds: finishTaskIds.map(Number),
+      };
+  
+      dispatch(updateIssuesLocation({
+        ...columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      }));
     }
 
-    const startTaskIds = [...start.issuesIds];
-    const finishTaskIds = [...finish.issuesIds];
-    
-    startTaskIds.splice(source.index, 1);
-    finishTaskIds.splice(destination.index, 0, draggableId);
-
-    const newStart = {
-      ...start,
-      issuesIds: startTaskIds.map(Number),
-    };
-
-    const newFinish = {
-      ...finish,
-      issuesIds: finishTaskIds.map(Number),
-    };
-
-    dispatch(updateIssuesLocation({
-      ...columns,
-      [newStart.id]: newStart,
-      [newFinish.id]: newFinish,
-    }));
+    dispatch(saveRepository())
   }
 
   return (
