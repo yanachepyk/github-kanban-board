@@ -5,13 +5,19 @@ axios.defaults.baseURL = 'https://api.github.com';
 
 export const fetchIssues = createAsyncThunk(
   'dashboard/fetchIssues',
-  async ({author, repository}: FetchIssuesBody, thunkApi) => {
+  async (
+    { author, repository }: { author: string; repository: string },
+    thunkApi
+  ) => {
     try {
-      const { data } = await axios.get(`/repos/${author}/${repository}/issues?state=all`);
+      /** Need to add pagination support to load next chunks */
+      const { data } = await axios.get(
+        `/repos/${author}/${repository}/issues?state=all&per_page=100`
+      );
 
       return data;
     } catch (e) {
-        thunkApi.rejectWithValue(e);
+      thunkApi.rejectWithValue(e);
     }
   }
 );
@@ -24,30 +30,23 @@ export const fetchAuthor = createAsyncThunk(
 
       return data;
     } catch (e) {
-        thunkApi.rejectWithValue(e);
+      thunkApi.rejectWithValue(e);
     }
   }
 );
 
 export const fetchRepository = createAsyncThunk(
   'dashboard/fetchRepository',
-  async ({author, repository}: FetchIssuesBody, thunkApi) => {
+  async (
+    { author, repository }: { author: string; repository: string },
+    thunkApi
+  ) => {
     try {
       const { data } = await axios.get(`/repos/${author}/${repository}`);
 
       return data;
     } catch (e) {
-        thunkApi.rejectWithValue(e);
+      thunkApi.rejectWithValue(e);
     }
   }
 );
-
-export interface FetchIssuesAction {
-    type: string;
-    payload: FetchIssuesBody;
-}
-
-export interface FetchIssuesBody {
-    author: string;
-    repository: string;
-}

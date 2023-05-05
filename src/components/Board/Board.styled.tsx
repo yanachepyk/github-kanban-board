@@ -6,13 +6,14 @@ export const Text = styled.p`
 `;
 
 export const BoardContainer = styled(Card.Body)`
-    display: flex;
-    gap: 2rem;
-    min-height: 200px;
-    flex: initial;
+  display: flex;
+  gap: 2rem;
+  min-height: 200px;
+  flex: initial;
+  height: calc(100vh - 138px);
 `;
 
 export const BoardStyled = styled(Card)`
-    flex: 1 0 auto;
-    background-color: #d0e0f7;
+  flex: 1 0 auto;
+  background-color: #d0e0f7;
 `;

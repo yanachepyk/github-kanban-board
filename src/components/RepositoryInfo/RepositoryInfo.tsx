@@ -1,8 +1,18 @@
 import { Container, Link, LinksWrapper, Stars } from './RepositoryInfo.styled';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BsFillStarFill } from 'react-icons/bs';
+import {
+  AuthorInformation,
+  RepositoryInformation,
+} from '../../redux/dashboard/dashboard.model';
 
-const RepositoryInfo = ({author, repository}: any) => {
+const RepositoryInfo = ({
+  author,
+  repository,
+}: {
+  author: AuthorInformation;
+  repository: RepositoryInformation;
+}) => {
   return (
     <Container>
       <LinksWrapper>

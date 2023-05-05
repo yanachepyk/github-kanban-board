@@ -5,13 +5,25 @@ import {
   SubmitButtonStyled,
 } from './SearchForm.styled';
 import { useDispatch } from 'react-redux';
-import { FetchIssuesAction, fetchAuthor, fetchIssues, fetchRepository } from '../../redux/dashboard/operations';
-import { saveRepository, setActiveRepository } from '../../redux/dashboard/dashboardSlice';
+import {
+  fetchAuthor,
+  fetchIssues,
+  fetchRepository,
+} from '../../redux/dashboard/operations';
+import { setActiveRepository } from '../../redux/dashboard/dashboardSlice';
 import { createRepositoryId } from '../../shared/utils/string/repositoryIdentifier';
 
-const githubOriginUrl = "https://github.com";
+const githubOriginUrl = 'https://github.com';
 
-const SearchForm = ({boardId}: any) => {
+interface FetchIssuesAction {
+  type: string;
+  payload: {
+    author: string;
+    repository: string;
+  };
+}
+
+const SearchForm = () => {
   const dispatch = useDispatch();
 
   const handleFormSubmit = (e: any) => {
@@ -31,22 +43,25 @@ const SearchForm = ({boardId}: any) => {
         const [_, author, repository] = processedUrl.pathname.split('/');
         const repositoryId = createRepositoryId(author, repository);
 
-        if (boardId) {
-          dispatch(saveRepository());
-        }
-
         dispatch(setActiveRepository(repositoryId));
-        dispatch(fetchRepository({ author, repository }) as unknown as FetchIssuesAction);
+        dispatch(
+          fetchRepository({
+            author,
+            repository,
+          }) as unknown as FetchIssuesAction
+        );
         dispatch(fetchAuthor(author) as unknown as any);
-        dispatch(fetchIssues({ author, repository }) as unknown as FetchIssuesAction);
+        dispatch(
+          fetchIssues({ author, repository }) as unknown as FetchIssuesAction
+        );
 
         e.target.reset();
       }
     } catch (e) {
       console.error('Please enter a valid URL');
     }
-  }
-    
+  };
+
   return (
     <Form onSubmit={handleFormSubmit}>
       <LabelStyled htmlFor="repositoryUrl">Repository URL:</LabelStyled>

@@ -29,7 +29,7 @@ const Dashboard = () => {
 
   return (
     <DashboardStyled>
-      <SearchForm boardId={activeBoard.identifier} />
+      <SearchForm />
       {pageContent}
     </DashboardStyled>
   );

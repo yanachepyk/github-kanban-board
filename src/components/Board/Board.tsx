@@ -2,9 +2,12 @@ import Column from '../Column/Column';
 import { BoardContainer, BoardStyled } from './Board.styled';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useDispatch } from 'react-redux';
-import { saveRepository, updateIssuesLocation } from '../../redux/dashboard/dashboardSlice';
+import {
+  saveRepository,
+  updateIssuesLocation,
+} from '../../redux/dashboard/dashboardSlice';
 
-const Board = ({columns, columnsOrder}: any) => {
+const Board = ({ columns, columnsOrder }: any) => {
   const dispatch = useDispatch();
 
   const onDragEnd = ({ destination, source, draggableId }: any) => {
@@ -24,7 +27,7 @@ const Board = ({columns, columnsOrder}: any) => {
 
     if (start === finish) {
       const newTaskIds = [...start.issuesIds];
-      
+
       newTaskIds.splice(source.index, 1);
       newTaskIds.splice(destination.index, 0, draggableId);
 
@@ -33,36 +36,43 @@ const Board = ({columns, columnsOrder}: any) => {
         issuesIds: newTaskIds.map(Number),
       };
 
-      dispatch(updateIssuesLocation({
-        ...columns,
-        [newColumn.id]: newColumn,
-      }));
+      dispatch(
+        updateIssuesLocation({
+          ...columns,
+          [newColumn.id]: newColumn,
+        })
+      );
     } else {
       const startTaskIds = [...start.issuesIds];
       const finishTaskIds = [...finish.issuesIds];
-      
+
       startTaskIds.splice(source.index, 1);
       finishTaskIds.splice(destination.index, 0, draggableId);
-  
+
       const newStart = {
         ...start,
         issuesIds: startTaskIds.map(Number),
       };
-  
+
       const newFinish = {
         ...finish,
         issuesIds: finishTaskIds.map(Number),
       };
-  
-      dispatch(updateIssuesLocation({
-        ...columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      }));
+
+      dispatch(
+        updateIssuesLocation({
+          ...columns,
+          [newStart.id]: newStart,
+          [newFinish.id]: newFinish,
+        })
+      );
     }
 
-    dispatch(saveRepository())
-  }
+    /**
+     * Need to find a way how to optimize save of reordered repository
+     * before component destroy and page refresh instead of saving it each drag*/
+    dispatch(saveRepository(null));
+  };
 
   return (
     <BoardStyled>

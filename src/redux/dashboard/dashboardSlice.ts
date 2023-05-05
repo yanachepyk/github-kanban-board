@@ -1,23 +1,25 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, Slice, createSlice } from '@reduxjs/toolkit';
 import { fetchAuthor, fetchIssues, fetchRepository } from './operations';
 import { createRepositoryId } from '../../shared/utils/string/repositoryIdentifier';
+import {
+  Board,
+  Column,
+  Columns,
+  DashboardState,
+  Issue,
+} from './dashboard.model';
+import { KeyValueObject } from '../../shared/utils/models/keyValueObject.model';
 
-enum Columns {
-  TODO = 'col-1',
-  IN_PROGRESS = 'col-2',
-  CLOSED = 'col-3'
-}
-
-const repositoryTemplate = {
-  identifier: null,
+const boardTemplate: Board = {
+  identifier: '',
   repository: {
     name: '',
-    url: null,
+    url: '',
     stars: 0,
   },
   author: {
     username: '',
-    url: null,
+    url: '',
   },
   issues: {},
   columns: {
@@ -36,101 +38,101 @@ const repositoryTemplate = {
       title: 'Done',
       issuesIds: [],
     },
-  }
-}
+  },
+};
 
-const initialState: any = {
-  loading: false,
+const initialState: DashboardState = {
   repositories: {},
-  activeBoard: repositoryTemplate,
+  activeBoard: boardTemplate,
   columnsOrder: [Columns.TODO, Columns.IN_PROGRESS, Columns.CLOSED],
 };
 
-export const dashboardSlice = createSlice({
+export const dashboardSlice: Slice = createSlice({
   name: 'dashboard',
   initialState,
   reducers: {
-    updateIssuesLocation(state, action) {
+    updateIssuesLocation(
+      state: DashboardState,
+      action: PayloadAction<KeyValueObject<Column>>
+    ) {
       state.activeBoard.columns = action.payload;
     },
-    setActiveRepository(state, action) {
+    setActiveRepository(state: DashboardState, action: PayloadAction<string>) {
       const storedRepository = state.repositories[action.payload];
 
       if (storedRepository && storedRepository.identifier) {
         state.activeBoard = {
-          ...storedRepository
+          ...storedRepository,
         };
       } else {
         state.activeBoard = {
-          ...repositoryTemplate
+          ...boardTemplate,
         };
       }
     },
-    saveRepository(state) {
+    saveRepository(state: DashboardState) {
       if (state.activeBoard.identifier) {
         state.repositories[state.activeBoard.identifier] = state.activeBoard;
       }
-    }
+    },
   },
   extraReducers: builder =>
     builder
-      .addCase(fetchIssues.fulfilled, (state, action: any) => {
-        action.payload.forEach((issue: any) => {
-          /** Skip if already exist, as it might be already reordered and moved to another column */
-          if (state.activeBoard.issues[issue.id]) {
-            return;
-          }
+      .addCase(
+        fetchIssues.fulfilled,
+        (state: DashboardState, action: PayloadAction<Issue[]>) => {
+          action.payload.forEach((issue: Issue) => {
+            /** Skip if already exist, as it might be already reordered and moved to another column */
+            if (state.activeBoard.issues[issue.id]) {
+              return;
+            }
 
-          /** Closed issues */
-          if (issue.state === 'closed') {
-            state.activeBoard.columns[Columns.CLOSED].issuesIds.push(issue.id);
-          }
+            /** Closed issues */
+            if (issue.state === 'closed') {
+              state.activeBoard.columns[Columns.CLOSED].issuesIds.push(
+                issue.id
+              );
+            }
 
-          /** In Progress issues */
-          if (issue.assignees.length && issue.state !== 'closed') {
-            state.activeBoard.columns[Columns.IN_PROGRESS].issuesIds.push(issue.id);
-          }
+            /** In Progress issues */
+            if (issue.assignees.length && issue.state !== 'closed') {
+              state.activeBoard.columns[Columns.IN_PROGRESS].issuesIds.push(
+                issue.id
+              );
+            }
 
-          /** ToDo issues */
-          if (!issue.assignees.length && issue.state === 'open') {
-            state.activeBoard.columns[Columns.TODO].issuesIds.push(issue.id);
-          }
+            /** ToDo issues */
+            if (!issue.assignees.length && issue.state === 'open') {
+              state.activeBoard.columns[Columns.TODO].issuesIds.push(issue.id);
+            }
 
-          state.activeBoard.issues[issue.id] = issue;
-        });
-
-        state.loading = false;
-      })
-      .addCase(fetchIssues.pending, state => {
-        state.loading = true;
-      })
-      .addCase(fetchIssues.rejected, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(fetchAuthor.fulfilled, (state, action: any) => {
-        state.activeBoard.author.url = action.payload.html_url;
-        state.activeBoard.author.username = action.payload.login;
-        state.loading = false;
-      })
-      .addCase(fetchAuthor.pending, state => {
-        state.loading = true;
-      })
-      .addCase(fetchAuthor.rejected, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(fetchRepository.fulfilled, (state, action: any) => {
-        state.activeBoard.identifier = createRepositoryId(action.payload.owner.login, action.payload.name);
-        state.activeBoard.repository.url = action.payload.html_url;
-        state.activeBoard.repository.name = action.payload.name;
-        state.activeBoard.repository.stars = action.payload.stargazers_count;
-        state.loading = false;
-      })
-      .addCase(fetchRepository.pending, state => {
-        state.loading = true;
-      })
-      .addCase(fetchRepository.rejected, (state, action) => {
-        state.loading = false;
-      }),
+            state.activeBoard.issues[issue.id] = issue;
+          });
+        }
+      )
+      .addCase(
+        fetchAuthor.fulfilled,
+        (
+          state: DashboardState,
+          action: PayloadAction<{ html_url: string; login: string }>
+        ) => {
+          state.activeBoard.author.url = action.payload.html_url;
+          state.activeBoard.author.username = action.payload.login;
+        }
+      )
+      .addCase(
+        fetchRepository.fulfilled,
+        (state: DashboardState, action: PayloadAction<any>) => {
+          state.activeBoard.identifier = createRepositoryId(
+            action.payload.owner.login,
+            action.payload.name
+          );
+          state.activeBoard.repository.url = action.payload.html_url;
+          state.activeBoard.repository.name = action.payload.name;
+          state.activeBoard.repository.stars = action.payload.stargazers_count;
+        }
+      ),
 });
 
-export const { updateIssuesLocation, setActiveRepository, saveRepository } = dashboardSlice.actions;
+export const { updateIssuesLocation, setActiveRepository, saveRepository } =
+  dashboardSlice.actions;
